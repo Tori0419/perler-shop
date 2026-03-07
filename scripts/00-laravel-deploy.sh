@@ -3,6 +3,23 @@ set -euo pipefail
 
 cd /var/www/html
 
+resolve_path() {
+  local configured_path="$1"
+  if [ -z "${configured_path}" ]; then
+    echo ""
+    return
+  fi
+
+  if [[ "${configured_path}" = /* ]]; then
+    echo "${configured_path}"
+  else
+    echo "/var/www/html/${configured_path}"
+  fi
+}
+
+SHOP_DATA_DIR_PATH="$(resolve_path "${SHOP_DATA_DIR:-storage/app/data}")"
+SHOP_UPLOAD_DIR_PATH="$(resolve_path "${SHOP_UPLOAD_DIR:-public/images/uploads/products}")"
+
 if [ ! -f .env ]; then
   cp .env.example .env
 fi
@@ -16,12 +33,11 @@ mkdir -p \
   bootstrap/cache \
   public/images/uploads/products
 
-if [ -n "${SHOP_DATA_DIR:-}" ]; then
-  mkdir -p "${SHOP_DATA_DIR}"
-fi
+mkdir -p "${SHOP_DATA_DIR_PATH}" "${SHOP_UPLOAD_DIR_PATH}"
 
-if [ -n "${SHOP_UPLOAD_DIR:-}" ]; then
-  mkdir -p "${SHOP_UPLOAD_DIR}"
+if [ "${DEMO_RESET_ON_BOOT:-false}" = "true" ]; then
+  rm -f "${SHOP_DATA_DIR_PATH}/orders.json" "${SHOP_DATA_DIR_PATH}/products.json"
+  find "${SHOP_UPLOAD_DIR_PATH}" -mindepth 1 -type f ! -name '.gitkeep' -delete || true
 fi
 
 composer install \
@@ -48,12 +64,12 @@ if [ -z "${APP_KEY:-}" ]; then
   export APP_KEY
 fi
 
-php -r '$path=".env"; $env=file_exists($path)?file_get_contents($path):""; $pairs=["APP_ENV"=>getenv("APP_ENV")?:"production","APP_DEBUG"=>getenv("APP_DEBUG")?:"false","APP_URL"=>getenv("APP_URL")?: (getenv("RENDER_EXTERNAL_URL")?:""),"APP_KEY"=>getenv("APP_KEY")?:"","SHOP_DATA_DIR"=>getenv("SHOP_DATA_DIR")?:"storage/app/data","SHOP_UPLOAD_DIR"=>getenv("SHOP_UPLOAD_DIR")?:"public/images/uploads/products","SHOP_UPLOAD_PUBLIC_PREFIX"=>getenv("SHOP_UPLOAD_PUBLIC_PREFIX")?:"/images/uploads/products"]; foreach($pairs as $k=>$v){ if($v===""){ continue; } if(preg_match("/^".preg_quote($k,"/")."=/m",$env)){ $env=preg_replace("/^".preg_quote($k,"/")."=.*/m",$k."=".$v,$env); } else { $env .= (trim($env)==="" ? "" : PHP_EOL).$k."=".$v; } } file_put_contents($path,rtrim($env).PHP_EOL);'
+php -r '$path=".env"; $env=file_exists($path)?file_get_contents($path):""; $pairs=["APP_ENV"=>getenv("APP_ENV")?:"production","APP_DEBUG"=>getenv("APP_DEBUG")?:"false","APP_URL"=>getenv("APP_URL")?: (getenv("RENDER_EXTERNAL_URL")?:""),"APP_KEY"=>getenv("APP_KEY")?:"","DEMO_RESET_ON_BOOT"=>getenv("DEMO_RESET_ON_BOOT")?:"false","SHOP_DATA_DIR"=>getenv("SHOP_DATA_DIR")?:"storage/app/data","SHOP_UPLOAD_DIR"=>getenv("SHOP_UPLOAD_DIR")?:"public/images/uploads/products","SHOP_UPLOAD_PUBLIC_PREFIX"=>getenv("SHOP_UPLOAD_PUBLIC_PREFIX")?:"/images/uploads/products"]; foreach($pairs as $k=>$v){ if($v===""){ continue; } if(preg_match("/^".preg_quote($k,"/")."=/m",$env)){ $env=preg_replace("/^".preg_quote($k,"/")."=.*/m",$k."=".$v,$env); } else { $env .= (trim($env)==="" ? "" : PHP_EOL).$k."=".$v; } } file_put_contents($path,rtrim($env).PHP_EOL);'
 
 php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-chmod -R ug+rwx storage bootstrap/cache public/images/uploads/products || true
-chown -R nginx:nginx storage bootstrap/cache public/images/uploads/products || true
+chmod -R ug+rwx storage bootstrap/cache "${SHOP_UPLOAD_DIR_PATH}" || true
+chown -R nginx:nginx storage bootstrap/cache "${SHOP_UPLOAD_DIR_PATH}" || true

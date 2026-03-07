@@ -2,7 +2,7 @@ services:
   - type: web
     name: perler-shop
     runtime: docker
-    plan: starter
+    plan: free
     region: oregon
     branch: master
     dockerfilePath: ./Dockerfile
@@ -23,13 +23,11 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
+      - key: DEMO_RESET_ON_BOOT
+        value: "true"
       - key: SHOP_DATA_DIR
-        value: /var/data/data
+        value: storage/app/data
       - key: SHOP_UPLOAD_DIR
-        value: /var/data/uploads/products
+        value: public/images/uploads/products
       - key: SHOP_UPLOAD_PUBLIC_PREFIX
-        value: /uploads/products
-    disk:
-      name: perler-shop-disk
-      mountPath: /var/data
-      sizeGB: 1
+        value: /images/uploads/products
