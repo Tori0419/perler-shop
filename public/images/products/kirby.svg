@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fda4af"/>
+      <stop offset="100%" stop-color="#f9a8d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" rx="18" fill="url(#bg)"/>
+  <circle cx="160" cy="108" r="62" fill="#fbcfe8"/>
+  <ellipse cx="136" cy="98" rx="9" ry="12" fill="#111827"/>
+  <ellipse cx="184" cy="98" rx="9" ry="12" fill="#111827"/>
+  <path d="M145 130 Q160 145 175 130" stroke="#9d174d" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <text x="18" y="30" font-size="20" fill="#831843" font-family="Arial, sans-serif" font-weight="700">Kirby Beads</text>
+</svg>
