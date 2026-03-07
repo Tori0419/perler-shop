@@ -23,12 +23,6 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-      - key: ADMIN_USERNAME
-        sync: false
-      - key: ADMIN_PASSWORD
-        sync: false
-      - key: APP_KEY
-        sync: false
       - key: SHOP_DATA_DIR
         value: /var/data/data
       - key: SHOP_UPLOAD_DIR
