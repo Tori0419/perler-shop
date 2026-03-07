@@ -13,6 +13,11 @@ use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\CustomerAuthenticate;
 use Illuminate\Support\Facades\Route;
 
+// Health check endpoint for Render.com
+Route::get('/_health', function () {
+    return response('ok', 200)->header('Content-Type', 'text/plain');
+});
+
 Route::get('/uploads/products/{filename}', [UploadController::class, 'productImage'])
     ->where('filename', '[A-Za-z0-9\-\._]+')
     ->name('uploads.product-image');

@@ -1,17 +1,37 @@
-FROM richarvey/nginx-php-fpm:3.1.6
+FROM composer:2 AS vendor
 
-ENV WEBROOT=/var/www/html/public \
-    RUN_SCRIPTS=1 \
-    SKIP_COMPOSER=1 \
-    REAL_IP_HEADER=X-Forwarded-For \
-    LOG_STDOUT=true \
-    LOG_STDERR=true \
-    APP_ENV=production \
-    APP_DEBUG=false \
-    COMPOSER_ALLOW_SUPERUSER=1
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install \
+  --no-dev \
+  --prefer-dist \
+  --optimize-autoloader \
+  --no-scripts \
+  --no-interaction \
+  --no-progress \
+  --ignore-platform-req=php
+
+COPY . /app
+
+FROM php:8.4-cli
 
 WORKDIR /var/www/html
 
-COPY --chown=nginx:nginx . /var/www/html
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libonig-dev \
+    libsqlite3-dev \
+    libzip-dev \
+    pkg-config \
+    unzip \
+    && docker-php-ext-install mbstring pdo pdo_sqlite \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN chmod +x /var/www/html/scripts/00-laravel-deploy.sh
+COPY --from=vendor /app /var/www/html
+
+RUN chmod +x /var/www/html/scripts/render-start.sh
+
+ENV APP_ENV=production \
+    APP_DEBUG=false
+
+CMD ["/var/www/html/scripts/render-start.sh"]

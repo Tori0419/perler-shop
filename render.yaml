@@ -7,7 +7,7 @@ services:
     branch: master
     dockerfilePath: ./Dockerfile
     autoDeploy: true
-    healthCheckPath: /login
+    healthCheckPath: /_health
     envVars:
       - key: APP_ENV
         value: production
