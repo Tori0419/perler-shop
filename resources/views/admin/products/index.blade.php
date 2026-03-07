@@ -5,7 +5,7 @@
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
         <h2>后台商品管理</h2>
-        <form action="{{ route('admin.logout') }}" method="POST">
+        <form action="{{ route('admin.logout', [], false) }}" method="POST">
             @csrf
             <button type="submit" class="btn btn-muted">退出管理员</button>
         </form>
@@ -13,7 +13,7 @@
 
     <div class="card mb-2">
         <h3 style="margin-top: 0;">新增商品</h3>
-        <form action="{{ route('admin.products.store') }}" method="POST" class="row" enctype="multipart/form-data">
+        <form action="{{ route('admin.products.store', [], false) }}" method="POST" class="row" enctype="multipart/form-data">
             @csrf
             <div class="col-4">
                 <label>名称</label>
@@ -65,7 +65,7 @@
                         <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="product-image">
                     </div>
                     <div class="col-8">
-                        <form action="{{ route('admin.products.update', $product['id']) }}" method="POST" class="row" enctype="multipart/form-data">
+                        <form action="{{ route('admin.products.update', $product['id'], false) }}" method="POST" class="row" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="old_image" value="{{ $product['image'] }}">
@@ -106,7 +106,7 @@
                             </div>
                         </form>
 
-                        <form action="{{ route('admin.products.destroy', $product['id']) }}" method="POST" style="margin-top: 10px;">
+                        <form action="{{ route('admin.products.destroy', $product['id'], false) }}" method="POST" style="margin-top: 10px;">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger" type="submit">删除商品</button>

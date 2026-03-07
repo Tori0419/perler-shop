@@ -65,11 +65,11 @@
                                 <td style="min-width: 130px;">
                                     @if ($status === 'pending')
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                            <form action="{{ route('admin.orders.ship', $order['id']) }}" method="POST">
+                                            <form action="{{ route('admin.orders.ship', $order['id'], false) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success">发货</button>
                                             </form>
-                                            <form action="{{ route('admin.orders.cancel', $order['id']) }}" method="POST">
+                                            <form action="{{ route('admin.orders.cancel', $order['id'], false) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-danger">取消</button>
                                             </form>

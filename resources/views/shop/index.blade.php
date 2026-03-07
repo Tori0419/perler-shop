@@ -34,7 +34,7 @@
                     <p class="text-muted" style="min-height: 44px;">{{ $product['description'] }}</p>
                     <div style="font-weight: 700; margin-bottom: 10px;">HKD {{ number_format($product['price'], 2) }}</div>
 
-                    <form action="{{ route('cart.add') }}" method="POST" class="row add-to-cart-form">
+                    <form action="{{ route('cart.add', [], false) }}" method="POST" class="row add-to-cart-form">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product['id'] }}">
                         <div class="col-6">

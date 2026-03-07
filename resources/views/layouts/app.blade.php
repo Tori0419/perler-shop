@@ -202,7 +202,7 @@
                     <a href="{{ route('admin.orders.index') }}">后台订单</a>
                     <a href="{{ route('admin.products.index') }}">后台商品</a>
                     <span style="font-size: 13px; opacity: 0.9;">管理员：{{ $adminUsername }}</span>
-                    <form action="{{ route('admin.logout') }}" method="POST">
+                    <form action="{{ route('admin.logout', [], false) }}" method="POST">
                         @csrf
                         <button type="submit" class="inline-form-button">退出管理员</button>
                     </form>
@@ -211,7 +211,7 @@
                     <a href="{{ route('cart.index') }}" id="cartNavLink">购物车{{ $cartQty > 0 ? "（{$cartQty}）" : '' }}</a>
                     <a href="{{ route('orders.history') }}">历史订单</a>
                     <span style="font-size: 13px; opacity: 0.9;">用户：{{ $customer['name'] }}</span>
-                    <form action="{{ route('customer.logout') }}" method="POST">
+                    <form action="{{ route('customer.logout', [], false) }}" method="POST">
                         @csrf
                         <button type="submit" class="inline-form-button">退出用户</button>
                     </form>

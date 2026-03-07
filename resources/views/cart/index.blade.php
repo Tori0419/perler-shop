@@ -23,7 +23,7 @@
         <div class="card">
             <p class="text-muted" style="margin-top: 0;">数量输入后会通过 AJAX 无刷新同步到服务器。</p>
 
-            <form method="POST" action="{{ route('cart.update') }}" id="cartUpdateForm">
+            <form method="POST" action="{{ route('cart.update', [], false) }}" id="cartUpdateForm">
                 @csrf
 
                 <div class="table-wrap">
@@ -57,7 +57,7 @@
                                             data-product-id="{{ $item['product_id'] }}"
                                             data-price="{{ $item['price'] }}"
                                             data-subtotal-id="subtotal-{{ $item['product_id'] }}"
-                                            data-update-url="{{ route('cart.update.ajax') }}"
+                                            data-update-url="{{ route('cart.update.ajax', [], false) }}"
                                         >
                                     </td>
                                     <td id="subtotal-{{ $item['product_id'] }}" class="subtotal">
@@ -67,7 +67,7 @@
                                         <button
                                             class="btn btn-danger"
                                             type="submit"
-                                            formaction="{{ route('cart.remove', $item['product_id']) }}"
+                                            formaction="{{ route('cart.remove', $item['product_id'], false) }}"
                                             formmethod="POST"
                                             formnovalidate
                                         >
@@ -96,7 +96,7 @@
                 <p class="text-muted">下单前请先登录用户账号（用于区分不同用户订单）。</p>
                 <a href="{{ route('customer.login') }}" class="btn btn-primary">去用户登录</a>
             @else
-                <form method="POST" action="{{ route('checkout.submit') }}" id="checkoutForm">
+                <form method="POST" action="{{ route('checkout.submit', [], false) }}" id="checkoutForm">
                     @csrf
                     <div class="row">
                         <div class="col-4">

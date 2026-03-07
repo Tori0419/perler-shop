@@ -32,7 +32,7 @@
     </div>
 
     <div class="card" style="max-width: 520px;">
-        <form action="{{ route('customer.login.submit') }}" method="POST">
+        <form action="{{ route('customer.login.submit', [], false) }}" method="POST">
             @csrf
             <label for="username">用户名</label>
             <input class="input mt-1 mb-2" id="username" name="username" value="{{ old('username') }}" required>
