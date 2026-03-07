@@ -8,9 +8,14 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\UploadController;
 use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\CustomerAuthenticate;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/uploads/products/{filename}', [UploadController::class, 'productImage'])
+    ->where('filename', '[A-Za-z0-9\-\._]+')
+    ->name('uploads.product-image');
 
 Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('customer.login');
 Route::post('/login', [CustomerAuthController::class, 'login'])->name('customer.login.submit');

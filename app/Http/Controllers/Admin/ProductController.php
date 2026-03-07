@@ -90,7 +90,7 @@ class ProductController extends Controller
         $uploadedFile = $request->file('image_file');
 
         if ($uploadedFile instanceof UploadedFile && $uploadedFile->isValid()) {
-            $targetDir = public_path('images/uploads/products');
+            $targetDir = $this->uploadDirectory();
 
             if (! is_dir($targetDir)) {
                 mkdir($targetDir, 0755, true);
@@ -100,7 +100,7 @@ class ProductController extends Controller
             $fileName = now()->format('YmdHis').'_'.bin2hex(random_bytes(4)).'.'.$extension;
             $uploadedFile->move($targetDir, $fileName);
 
-            return '/images/uploads/products/'.$fileName;
+            return $this->uploadPublicPrefix().'/'.$fileName;
         }
 
         $trimmedInput = trim($imageInput);
@@ -114,5 +114,31 @@ class ProductController extends Controller
         }
 
         return '/images/products/default.svg';
+    }
+
+    private function uploadDirectory(): string
+    {
+        $configured = trim((string) config('shop.upload_dir', ''));
+
+        if ($configured === '') {
+            return public_path('images/uploads/products');
+        }
+
+        if (str_starts_with($configured, '/')) {
+            return rtrim($configured, '/');
+        }
+
+        return rtrim(base_path($configured), '/');
+    }
+
+    private function uploadPublicPrefix(): string
+    {
+        $configured = trim((string) config('shop.upload_public_prefix', ''));
+
+        if ($configured === '') {
+            return '/images/uploads/products';
+        }
+
+        return '/'.trim($configured, '/');
     }
 }

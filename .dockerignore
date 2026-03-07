@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.env.*
+vendor
+node_modules
+tests
+submission
+storage/tmp-patterns
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/framework/testing
+npm-debug.log
+yarn-error.log
