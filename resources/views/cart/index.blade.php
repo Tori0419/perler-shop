@@ -85,7 +85,7 @@
                         <strong>总价：<span id="grandTotal">HKD {{ number_format($initialTotal, 2) }}</span></strong>
                         <div id="ajaxStatus" class="text-muted mt-1" style="font-size: 12px;"></div>
                     </div>
-                    <button type="submit" class="btn btn-success">手动保存（备用）</button>
+                    <button type="submit" class="btn btn-success">保存</button>
                 </div>
             </form>
         </div>
@@ -214,7 +214,7 @@
 
                     setAjaxStatus('已自动同步到服务器');
                 } catch (error) {
-                    setAjaxStatus('自动同步失败，请点击“手动保存（备用）”', true);
+                    setAjaxStatus('自动同步失败，请点击“保存”', true);
                 }
             };
 

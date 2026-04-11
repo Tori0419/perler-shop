@@ -6,7 +6,7 @@
     <h2>用户登录</h2>
 
     <div class="card mb-2">
-        <h3 style="margin-top: 0;">演示账号（写死）</h3>
+        <h3 style="margin-top: 0;">演示账号</h3>
         <div class="table-wrap">
             <table>
                 <thead>
