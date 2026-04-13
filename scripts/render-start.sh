@@ -50,5 +50,13 @@ php -r '$path=".env"; $env=file_exists($path) ? file_get_contents($path) : ""; $
 
 chmod -R ug+rwx storage bootstrap/cache "${SHOP_UPLOAD_DIR_PATH}" || true
 
+# Clear and rebuild caches on every start
+php artisan config:clear || true
+php artisan cache:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
+php artisan config:cache || true
+php artisan route:cache || true
+
 PORT_TO_USE="${PORT:-10000}"
 exec php -S "0.0.0.0:${PORT_TO_USE}" -t public public/server.php
