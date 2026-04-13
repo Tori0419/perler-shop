@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 font-sans text-slate-800 antialiased">
+<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-800 antialiased">
     @php
         $customer = session('customer');
         $isAdmin = session('is_admin', false);

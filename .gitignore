@@ -16,8 +16,12 @@
 /public/build
 /public/hot
 /public/storage
+/public/images/uploads/products/*
+!/public/images/uploads/products/.gitkeep
 /storage/*.key
 /storage/pail
+/storage/app/data/*.json
+!/storage/app/data/.gitkeep
 /vendor
 Homestead.json
 Homestead.yaml

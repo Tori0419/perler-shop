@@ -3,18 +3,25 @@
 @section('title', '管理员登录')
 
 @section('content')
-    <h2>管理员登录</h2>
-    <div class="card" style="max-width: 460px;">
-        <p class="text-muted">演示账号：<code>admin</code>，密码：<code>admin123</code></p>
-        <form method="POST" action="{{ route('admin.login.submit', [], false) }}">
-            @csrf
-            <label for="username">用户名</label>
-            <input class="input mt-1 mb-2" id="username" name="username" value="{{ old('username') }}" required>
+    <x-login-panel 
+        title="管理后台"
+        subtitle="Perler Shop 管理系统"
+        :action="route('admin.login.submit', [], false)"
+        submitText="登录后台"
+        gradient="from-slate-700 to-slate-900"
+        icon="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+    >
+        <x-slot:demo>
+            <span class="font-medium text-amber-700">演示账号：</span>
+            <code class="px-2 py-0.5 bg-amber-100 rounded text-amber-800 font-mono">admin</code>
+            <span class="text-amber-600 mx-1">密码：</span>
+            <code class="px-2 py-0.5 bg-amber-100 rounded text-amber-800 font-mono">admin123</code>
+        </x-slot:demo>
 
-            <label for="password">密码</label>
-            <input class="input mt-1" id="password" name="password" type="password" required>
-
-            <button type="submit" class="btn btn-primary mt-2">登录后台</button>
-        </form>
-    </div>
+        <x-slot:footer>
+            <a href="{{ route('shop.index') }}" class="text-sm text-gray-500 hover:text-indigo-600 transition-colors">
+                ← 返回商城首页
+            </a>
+        </x-slot:footer>
+    </x-login-panel>
 @endsection
