@@ -14,6 +14,14 @@ RUN composer install \
 
 COPY . /app
 
+FROM node:20-slim AS assets
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
 FROM php:8.4-cli
 
 WORKDIR /var/www/html
@@ -28,6 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=vendor /app /var/www/html
+COPY --from=assets /app/public/build /var/www/html/public/build
 
 RUN chmod +x /var/www/html/scripts/render-start.sh
 
