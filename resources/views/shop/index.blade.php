@@ -1,173 +1,68 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', '首页 - 拼豆在线订购系统')
 
 @section('content')
-    <div class="card mb-2">
-        <form action="{{ route('shop.index') }}" method="GET" class="row" style="align-items: end;">
-            <div class="col-8">
-                <label for="q" class="text-muted">搜索拼豆作品</label>
-                <input class="input mt-1" id="q" name="q" value="{{ $keyword }}" placeholder="输入关键字后点“搜索”">
-            </div>
-            <div class="col-2">
-                <button type="submit" class="btn btn-primary mt-1" style="width: 100%;">搜索</button>
-            </div>
-            <div class="col-2">
-                <a class="btn btn-muted mt-1" href="{{ route('shop.index') }}" style="width: 100%;">清空</a>
-            </div>
-        </form>
+    {{-- Page header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
+            探索拼豆作品
+        </h1>
+        <p class="mt-2 text-lg text-slate-500">
+            精选手工拼豆艺术品，为您的生活增添色彩
+        </p>
     </div>
 
-    <div id="addCartStatus" class="card mb-2 text-muted" style="display: none; padding: 10px 12px;"></div>
+    {{-- Search bar --}}
+    <x-search-bar
+        :action="route('shop.index')"
+        :value="$keyword"
+        label="搜索拼豆作品"
+        placeholder="输入商品名称或描述关键字..."
+        class="mb-8"
+    />
+
+    {{-- Add to cart status toast --}}
+    <div
+        id="addCartStatus"
+        class="mb-6 hidden rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 p-4 shadow-lg shadow-emerald-500/10"
+    ></div>
+
+    {{-- Results --}}
+    @if ($keyword)
+        <div class="mb-6 flex items-center gap-2 text-sm text-slate-500">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            搜索 "<span class="font-medium text-slate-700">{{ $keyword }}</span>" 找到 {{ count($products) }} 个结果
+        </div>
+    @endif
 
     @if (count($products) === 0)
-        <div class="card">
-            <p>没有找到符合条件的拼豆作品。</p>
+        {{-- Empty state --}}
+        <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/50 py-16 text-center">
+            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+            </div>
+            <h3 class="mb-2 text-lg font-semibold text-slate-700">没有找到商品</h3>
+            <p class="mb-6 text-slate-500">尝试使用其他关键字搜索</p>
+            @if ($keyword)
+                <a
+                    href="{{ route('shop.index') }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-600"
+                >
+                    查看全部商品
+                </a>
+            @endif
         </div>
     @else
-        <div class="grid">
+        {{-- Product grid --}}
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @foreach ($products as $product)
-                <div class="card">
-                    <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="product-image">
-                    <h3 style="margin: 0 0 6px;">{{ $product['name'] }}</h3>
-                    <div class="text-muted">库存：{{ $product['stock'] }}</div>
-                    <p class="text-muted" style="min-height: 44px;">{{ $product['description'] }}</p>
-                    <div style="font-weight: 700; margin-bottom: 10px;">HKD {{ number_format($product['price'], 2) }}</div>
-
-                    <form action="{{ route('cart.add', [], false) }}" method="POST" class="row add-to-cart-form">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product['id'] }}">
-                        <div class="col-6">
-                            <input
-                                type="number"
-                                class="input shop-qty-input"
-                                name="qty"
-                                min="1"
-                                value="1"
-                                aria-label="数量"
-                            >
-                        </div>
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-primary add-to-cart-btn" style="width: 100%;">加入购物车</button>
-                        </div>
-                    </form>
-                </div>
+                <x-product-card :product="$product" />
             @endforeach
         </div>
     @endif
-@endsection
-
-@section('scripts')
-    <script>
-        (() => {
-            const forms = Array.from(document.querySelectorAll('.add-to-cart-form'));
-            const qtyInputs = Array.from(document.querySelectorAll('.shop-qty-input'));
-            const statusBox = document.getElementById('addCartStatus');
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-            const cartNavLink = document.getElementById('cartNavLink');
-
-            if (forms.length === 0) {
-                return;
-            }
-
-            const setStatus = (text, isError = false) => {
-                if (!statusBox) {
-                    return;
-                }
-                statusBox.style.display = 'block';
-                statusBox.style.background = isError ? '#fee2e2' : '#ecfeff';
-                statusBox.style.color = isError ? '#991b1b' : '#155e75';
-                statusBox.textContent = text;
-            };
-
-            const updateCartNav = (cartQty) => {
-                if (!cartNavLink || typeof cartQty !== 'number') {
-                    return;
-                }
-                cartNavLink.textContent = cartQty > 0 ? `购物车（${cartQty}）` : '购物车';
-            };
-
-            const normalizeQuantity = (inputElement) => {
-                if (!inputElement) {
-                    return 1;
-                }
-
-                const quantity = Number(inputElement.value);
-                if (!Number.isInteger(quantity) || quantity <= 0) {
-                    inputElement.value = '1';
-                    return 1;
-                }
-
-                return quantity;
-            };
-
-            qtyInputs.forEach((inputElement) => {
-                normalizeQuantity(inputElement);
-                inputElement.addEventListener('blur', () => {
-                    normalizeQuantity(inputElement);
-                });
-            });
-
-            forms.forEach((form) => {
-                form.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-
-                    const button = form.querySelector('.add-to-cart-btn');
-                    const qtyInput = form.querySelector('input[name="qty"]');
-                    const quantity = normalizeQuantity(qtyInput);
-
-                    if (!Number.isInteger(quantity) || quantity <= 0) {
-                        setStatus('数量必须为正整数。', true);
-                        qtyInput?.focus();
-                        return;
-                    }
-
-                    try {
-                        if (button) {
-                            button.disabled = true;
-                            button.textContent = '加入中...';
-                        }
-
-                        const response = await fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken,
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            },
-                            body: new FormData(form)
-                        });
-
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                            return;
-                        }
-
-                        const data = await response.json();
-
-                        if (!response.ok || !data.ok) {
-                            const message = data.message
-                                || data.errors?.product_id?.[0]
-                                || data.errors?.qty?.[0]
-                                || '加入购物车失败，请重试。';
-                            throw new Error(message);
-                        }
-
-                        updateCartNav(data.cart_qty);
-                        if (qtyInput) {
-                            qtyInput.value = '1';
-                        }
-                        setStatus(`已加入购物车：${data.cart_qty ?? 0} 件商品`, false);
-                    } catch (error) {
-                        setStatus(error.message || '加入购物车失败，请重试。', true);
-                    } finally {
-                        if (button) {
-                            button.disabled = false;
-                            button.textContent = '加入购物车';
-                        }
-                    }
-                });
-            });
-        })();
-    </script>
 @endsection

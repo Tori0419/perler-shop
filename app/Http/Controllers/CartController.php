@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CartService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
+    public function __construct(
+        private CartService $cartService
+    ) {}
+
     public function index(Request $request)
     {
         $cart = $request->session()->get('cart', []);
@@ -60,6 +65,9 @@ class CartController extends Controller
 
         $request->session()->put('cart', $cart);
 
+        // Sync to persistent storage
+        $this->cartService->syncToStorage($request);
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'ok' => true,
@@ -67,7 +75,7 @@ class CartController extends Controller
                 'product_id' => $productId,
                 'product_qty' => (int) ($cart[$productId]['qty'] ?? 0),
                 'cart_count' => count($cart),
-                'cart_qty' => $this->calculateQuantity($cart),
+                'cart_qty' => $this->cartService->calculateQuantity($cart),
             ]);
         }
 
@@ -116,6 +124,9 @@ class CartController extends Controller
 
         $request->session()->put('cart', $cart);
 
+        // Sync to persistent storage
+        $this->cartService->syncToStorage($request);
+
         return redirect()
             ->route('cart.index')
             ->with('success', '购物车已更新。');
@@ -156,8 +167,11 @@ class CartController extends Controller
         $cart[$productId]['qty'] = $quantity;
         $request->session()->put('cart', $cart);
 
+        // Sync to persistent storage
+        $this->cartService->syncToStorage($request);
+
         $subtotal = round(((float) $cart[$productId]['price']) * $quantity, 2);
-        $total = $this->calculateTotal($cart);
+        $total = $this->cartService->calculateTotal($cart);
 
         return response()->json([
             'ok' => true,
@@ -173,30 +187,22 @@ class CartController extends Controller
         unset($cart[$id]);
         $request->session()->put('cart', $cart);
 
+        // Sync to persistent storage
+        $this->cartService->syncToStorage($request);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            $total = $this->cartService->calculateTotal($cart);
+            $cartQty = $this->cartService->calculateQuantity($cart);
+
+            return response()->json([
+                'ok'       => true,
+                'cart_qty' => $cartQty,
+                'total'    => $total,
+            ]);
+        }
+
         return redirect()
             ->route('cart.index')
             ->with('success', '商品已移除。');
-    }
-
-    private function calculateTotal(array $cart): float
-    {
-        $total = 0.0;
-
-        foreach ($cart as $cartItem) {
-            $total += ((float) ($cartItem['price'] ?? 0)) * ((int) ($cartItem['qty'] ?? 0));
-        }
-
-        return round($total, 2);
-    }
-
-    private function calculateQuantity(array $cart): int
-    {
-        $quantity = 0;
-
-        foreach ($cart as $cartItem) {
-            $quantity += (int) ($cartItem['qty'] ?? 0);
-        }
-
-        return $quantity;
     }
 }

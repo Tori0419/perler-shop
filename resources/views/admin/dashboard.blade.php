@@ -3,7 +3,7 @@
 @section('title', '后台统计报表')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <div class="row-between">
         <h2>订单统计与报表</h2>
         <div style="display: flex; gap: 8px;">
             <a href="{{ route('admin.products.index') }}" class="btn btn-muted">去商品管理</a>

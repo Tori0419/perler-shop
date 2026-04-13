@@ -2,19 +2,7 @@
 
 @section('title', '历史订单')
 
-@php
-    $statusText = [
-        'pending' => '待处理',
-        'shipped' => '已发货',
-        'cancelled' => '已取消',
-    ];
-
-    $statusClass = [
-        'pending' => 'badge-warning',
-        'shipped' => 'badge-success',
-        'cancelled' => 'badge-danger',
-    ];
-@endphp
+@include('partials.order-status-maps')
 
 @section('content')
     <h2>历史订单</h2>

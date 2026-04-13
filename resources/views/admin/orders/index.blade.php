@@ -2,22 +2,10 @@
 
 @section('title', '后台订单管理')
 
-@php
-    $statusText = [
-        'pending' => '待处理',
-        'shipped' => '已发货',
-        'cancelled' => '已取消',
-    ];
-
-    $statusClass = [
-        'pending' => 'badge-warning',
-        'shipped' => 'badge-success',
-        'cancelled' => 'badge-danger',
-    ];
-@endphp
+@include('partials.order-status-maps')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <div class="row-between">
         <h2>后台订单管理</h2>
         <a href="{{ route('admin.dashboard') }}" class="btn btn-muted">返回统计页</a>
     </div>
@@ -71,7 +59,7 @@
                                             </form>
                                             <form action="{{ route('admin.orders.cancel', $order['id'], false) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="btn btn-danger">取消</button>
+                                                <button type="submit" class="btn btn-danger" onclick="return confirm('确定要取消此订单吗？')">取消</button>
                                             </form>
                                         </div>
                                     @else

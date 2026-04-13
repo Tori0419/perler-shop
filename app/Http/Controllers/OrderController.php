@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -9,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    public function checkout(Request $request, OrderService $orderService, ProductService $productService)
+    public function checkout(Request $request, OrderService $orderService, ProductService $productService, CartService $cartService)
     {
         $customer = $request->session()->get('customer');
 
@@ -73,6 +74,9 @@ class OrderController extends Controller
         $customer['address'] = $validated['address'];
         $request->session()->put('customer', $customer);
         $request->session()->forget('cart');
+
+        // Clear persisted cart after successful order
+        $cartService->clearCart($customer['id']);
 
         return redirect()
             ->route('orders.history')

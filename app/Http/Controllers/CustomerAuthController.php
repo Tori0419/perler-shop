@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CartService;
 use App\Services\CustomerAuthService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -25,7 +26,7 @@ class CustomerAuthController extends Controller
         ]);
     }
 
-    public function login(Request $request, CustomerAuthService $customerAuthService)
+    public function login(Request $request, CustomerAuthService $customerAuthService, CartService $cartService)
     {
         $validated = $request->validate([
             'username' => ['required', 'string'],
@@ -43,13 +44,23 @@ class CustomerAuthController extends Controller
         $request->session()->forget(['is_admin', 'admin_username']);
         $request->session()->put('customer', $customer);
 
+        // Load user's persisted cart into session (merges with any guest cart)
+        $cartService->loadToSession($request, $customer['id']);
+
         return redirect()
             ->intended(route('shop.index'))
             ->with('success', "欢迎回来，{$customer['name']}！");
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request, CartService $cartService)
     {
+        $customer = $request->session()->get('customer');
+
+        // Save cart to persistent storage before logout
+        if (is_array($customer) && !empty($customer['id'])) {
+            $cartService->saveFromSession($request, $customer['id']);
+        }
+
         $request->session()->forget(['customer', 'cart']);
 
         return redirect()

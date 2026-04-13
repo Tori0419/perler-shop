@@ -3,7 +3,7 @@
 @section('title', '后台商品管理')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <div class="row-between">
         <h2>后台商品管理</h2>
         <form action="{{ route('admin.logout', [], false) }}" method="POST">
             @csrf
@@ -109,7 +109,7 @@
                         <form action="{{ route('admin.products.destroy', $product['id'], false) }}" method="POST" style="margin-top: 10px;">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger" type="submit">删除商品</button>
+                            <button class="btn btn-danger" type="submit" onclick="return confirm('确定要删除此商品吗？该操作无法撤销。')">删除商品</button>
                         </form>
                     </div>
                 </div>

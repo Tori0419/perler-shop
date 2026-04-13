@@ -26,9 +26,11 @@ Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('custom
 Route::post('/login', [CustomerAuthController::class, 'login'])->name('customer.login.submit');
 Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
 
+// Public route - browse products without login
+Route::get('/', [ShopController::class, 'index'])->name('shop.index');
+
 Route::middleware(CustomerAuthenticate::class)
     ->group(function (): void {
-        Route::get('/', [ShopController::class, 'index'])->name('shop.index');
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
         Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
         Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
